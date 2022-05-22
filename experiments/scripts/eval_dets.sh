@@ -10,3 +10,9 @@ CUDA_VISIBLE_DEVICES=${GPU_ID} python ./tools/eval_dets.py \
                 --dataset ${DATASET} \
                 --split ${SPLIT} \
                 --id ${ID}
+
+#SPLIT='val' #$3
+#CUDA_VISIBLE_DEVICES=${GPU_ID} python ./tools/eval_dets.py \
+#                --dataset ${DATASET} \
+#                --split ${SPLIT} \
+#                --id ${ID}

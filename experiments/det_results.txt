@@ -1,1 +1,2 @@
 [rsvg][test], id[mrcn_cmr_with_st]'s acc is 21.19%
+[rsvg][val], id[mrcn_cmr_with_st]'s acc is 19.90%
