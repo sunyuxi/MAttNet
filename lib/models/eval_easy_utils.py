@@ -113,7 +113,7 @@ def eval_split(loader, model, crit, split, opt):
 
       # expand labels
       label = labels[i:i+1]      # (1, label.size(1))
-      max_len = (label != 0).sum().data[0]
+      max_len = (label != 0).sum()
       label = label[:, :max_len] # (1, max_len) 
       expanded_labels = label.expand(len(ann_ids), max_len) # (n, max_len)
 

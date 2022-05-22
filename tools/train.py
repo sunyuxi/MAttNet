@@ -51,8 +51,9 @@ def lossFun(loader, optimizer, model, mm_crit, att_crit, opt, iter):
   if opt['lang_rank_weight'] > 0:
     Feats = loader.combine_feats(Feats, data['Feats'])
     labels = torch.cat([labels, data['neg_labels']])
-
-  att_labels, select_ixs = data['att_labels'], data['select_ixs']
+  
+  #sunyuxi
+  #att_labels, select_ixs = data['att_labels'], data['select_ixs']
 
   T['data'] = time.time()-tic
 
@@ -63,9 +64,11 @@ def lossFun(loader, optimizer, model, mm_crit, att_crit, opt, iter):
                                          Feats['cxt_fc7'], Feats['cxt_lfeats'],
                                          labels)
   loss = mm_crit(scores)
-  if select_ixs.numel() > 0:
-    loss += opt['att_weight'] * att_crit(att_scores.index_select(0, select_ixs),
-                                         att_labels.index_select(0, select_ixs))
+  #sunyuxi
+  #if select_ixs.numel() > 0:
+  #  loss += opt['att_weight'] * att_crit(att_scores.index_select(0, select_ixs),
+  #                                       att_labels.index_select(0, select_ixs))
+  
   # if iter < 500:
   #   num_pos = len(data['ref_ids'])
   #   loss += 0.1*model.sub_rel_kl(sub_attn[:num_pos], rel_attn[:num_pos], labels[:num_pos])
@@ -76,31 +79,31 @@ def lossFun(loader, optimizer, model, mm_crit, att_crit, opt, iter):
   T['model'] = time.time()-tic
 
   # return 
-  return loss.data[0], T, data['bounds']['wrapped']
-
+  return loss.data, T, data['bounds']['wrapped']
 
 def main(args):
 
   opt = vars(args)
 
   # initialize
-  opt['dataset_splitBy'] = opt['dataset'] + '_' + opt['splitBy']
+  opt['dataset_splitBy'] = opt['dataset']
   checkpoint_dir = osp.join(opt['checkpoint_path'], opt['dataset_splitBy'])
   if not osp.isdir(checkpoint_dir): os.makedirs(checkpoint_dir)
 
   # set random seed
   torch.manual_seed(opt['seed'])
   random.seed(opt['seed'])
+  np.random.seed(opt['seed'])
 
   # set up loader
   data_json = osp.join('cache/prepro', opt['dataset_splitBy'], 'data.json')
   data_h5 = osp.join('cache/prepro', opt['dataset_splitBy'], 'data.h5')
   loader = GtMRCNLoader(data_h5=data_h5, data_json=data_json)
   # prepare feats
-  feats_dir = '%s_%s_%s' % (args.net_name, args.imdb_name, args.tag)
-  head_feats_dir=osp.join('cache/feats/', opt['dataset_splitBy'], 'mrcn', feats_dir)
-  loader.prepare_mrcn(head_feats_dir, args)
-  ann_feats = osp.join('cache/feats', opt['dataset_splitBy'], 'mrcn', 
+  suffix = 'hbb_gt_%s_%s_%s.hdf5' % (args.net_name, args.imdb_name, args.tag)
+  head_feats_dir='data/rsvg/hbb_obb_features_gt'
+  loader.prepare_mrcn(head_feats_dir, suffix, args)
+  ann_feats = osp.join('cache/feats', opt['dataset_splitBy'], 
                        '%s_%s_%s_ann_feats.h5' % (opt['net_name'], opt['imdb_name'], opt['tag']))
   loader.loadFeats({'ann': ann_feats})
 
@@ -127,13 +130,16 @@ def main(args):
 
   # set up criterion
   mm_crit = MaxMarginCriterion(opt['visual_rank_weight'], opt['lang_rank_weight'], opt['margin'])
-  att_crit = nn.BCEWithLogitsLoss(loader.get_attribute_weights())
+  att_crit=None
+  #sunyuxi
+  #att_crit = nn.BCEWithLogitsLoss(loader.get_attribute_weights())
 
   # move to GPU
   if opt['gpuid'] >= 0:
     model.cuda()
     mm_crit.cuda()
-    att_crit.cuda()
+    #sunyuxi
+    #att_crit.cuda()
 
   # set up optimizer
   optimizer = torch.optim.Adam(model.parameters(), 
@@ -176,9 +182,9 @@ def main(args):
       val_accuracies += [(iter, acc)]
       print('validation loss: %.2f' % val_loss)
       print('validation acc : %.2f%%\n' % (acc*100.0))
-      print('validation precision : %.2f%%' % (overall['precision']*100.0))
-      print('validation recall    : %.2f%%' % (overall['recall']*100.0))
-      print('validation f1        : %.2f%%' % (overall['f1']*100.0))       
+      print('(attr) validation precision : %.2f%%' % (overall['precision']*100.0))
+      print('(attr) validation recall    : %.2f%%' % (overall['recall']*100.0))
+      print('(attr) validation f1        : %.2f%%' % (overall['f1']*100.0))       
             
       # save model if best
       current_score = acc
@@ -197,17 +203,18 @@ def main(args):
       infos['iter'] = iter
       infos['epoch'] = epoch
       infos['iterators'] = loader.iterators
-      infos['loss_history'] = loss_history
+      #infos['loss_history'] = loss_history #
       infos['val_accuracies'] = val_accuracies
       infos['val_loss_history'] = val_loss_history
       infos['best_val_score'] = best_val_score
+      
       infos['best_predictions'] = predictions if best_predictions is None else best_predictions
       infos['best_overall'] = overall if best_overall is None else best_overall
       infos['opt'] = opt
       infos['val_result_history'] = val_result_history
       infos['word_to_ix'] = loader.word_to_ix
       infos['att_to_ix'] = loader.att_to_ix
-      with open(osp.join(checkpoint_dir, opt['id']+'.json'), 'wb') as io:
+      with open(osp.join(checkpoint_dir, opt['id']+'.json'), 'w') as io:
         json.dump(infos, io)
         
     # update iter and epoch

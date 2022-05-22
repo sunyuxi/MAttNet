@@ -57,7 +57,7 @@ def eval_split(loader, model, crit, split, opt):
 
       # expand labels
       label = labels[i:i+1]      # (1, label.size(1))
-      max_len = (label != 0).sum().data[0]
+      max_len = (label != 0).sum()
       label = label[:, :max_len] # (1, max_len) 
       expanded_labels = label.expand(len(det_ids), max_len) # (n, max_len)
 
@@ -117,7 +117,7 @@ def eval_split(loader, model, crit, split, opt):
       predictions.append(entry)
 
       # if used up 
-      if num_sents > 0 and loss_eval >= num_sents:
+      if num_sents > 0 and loss_evals >= num_sents:
         finish_flag = True
         break
 

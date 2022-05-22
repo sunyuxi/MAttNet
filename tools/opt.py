@@ -5,14 +5,14 @@ def parse_opt():
 
     parser = argparse.ArgumentParser()
     # Data input settings
-    parser.add_argument('--dataset', type=str, default='refcoco', help='name of dataset')
-    parser.add_argument('--splitBy', type=str, default='unc', help='who splits this dataset')
+    parser.add_argument('--dataset', type=str, default='rsvg', help='name of dataset')
+    #parser.add_argument('--splitBy', type=str, default='unc', help='who splits this dataset')
     parser.add_argument('--start_from', type=str, default=None, help='continuing training from saved model')
     # FRCN setting
-    parser.add_argument('--imdb_name', default='coco_minus_refer', help='image databased trained on.')
-    parser.add_argument('--net_name', default='res101', help='net_name: res101 or vgg16')
-    parser.add_argument('--iters', default=1250000, type=int, help='iterations we trained for faster R-CNN')
-    parser.add_argument('--tag', default='notime', help='on default tf, don\'t change this!')
+    parser.add_argument('--imdb_name', default='dota_v1_0', help='image databased trained on.')
+    parser.add_argument('--net_name', default='res50', help='net_name: res101 or vgg16')
+    #parser.add_argument('--iters', default=1250000, type=int, help='iterations we trained for faster R-CNN')
+    parser.add_argument('--tag', default='RoITransformer', help='on default tf, don\'t change this!')
     # Visual Encoder Setting
     parser.add_argument('--visual_sample_ratio', type=float, default=0.3, help='ratio of same-type objects over different-type objects')
     parser.add_argument('--visual_fuse_mode', type=str, default='concat', help='concat or mul')

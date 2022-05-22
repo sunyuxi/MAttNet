@@ -1,22 +1,18 @@
 
 
-GPU_ID=$1
-DATASET=$2
-SPLITBY=$3
+GPU_ID=0 #$1
+DATASET='rsvg' #$2
 
-IMDB="coco_minus_refer"
-ITERS=1250000
-TAG="notime"
-NET="res101"
+IMDB="dota_v1_0"
+TAG="RoITransformer"
+NET="res50"
 ID="mrcn_cmr_with_st"
 
 CUDA_VISIBLE_DEVICES=${GPU_ID} python ./tools/train.py \
     --imdb_name ${IMDB} \
     --net_name ${NET} \
-    --iters ${ITERS} \
     --tag ${TAG} \
     --dataset ${DATASET} \
-    --splitBy ${SPLITBY} \
     --max_iters 30000 \
     --with_st 1 \
     --id ${ID}

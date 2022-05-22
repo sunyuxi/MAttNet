@@ -30,7 +30,7 @@ class MaxMarginCriterion(nn.Module):
         elif not self.visual_rank and self.lang_rank:
             batch_size = N//2
             assert isinstance(batch_size, int)
-            paird = cossim[:batch_size]
+            paired = cossim[:batch_size]
             unpaired = cossim[batch_size:]
             lang_rank_loss = self.lang_rank_weight * torch.clamp(self.margin + unpaired - paired, min=0)
             visual_rank_loss = 0.

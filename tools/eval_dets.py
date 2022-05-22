@@ -49,20 +49,20 @@ def evaluate(params):
   loader = DetsLoader(data_h5=data_h5, data_json=data_json, dets_json=dets_json)
 
   # loader's feats
-  feats_dir = '%s_%s_%s' % (model_opt['net_name'], model_opt['imdb_name'], model_opt['tag'])
   args.imdb_name = model_opt['imdb_name']
   args.net_name = model_opt['net_name']
   args.tag = model_opt['tag']
-  args.iters = model_opt['iters']
-  loader.prepare_mrcn(head_feats_dir=osp.join('cache/feats/', model_opt['dataset_splitBy'], 'mrcn', feats_dir), 
-                      args=args) 
-  det_feats = osp.join('cache/feats', model_opt['dataset_splitBy'], 'mrcn', 
+  # prepare feats
+  suffix = 'hbb_det_%s_%s_%s.hdf5' % (args.net_name, args.imdb_name, args.tag)
+  head_feats_dir='data/rsvg/hbb_obb_features_det'
+  loader.prepare_mrcn(head_feats_dir, suffix, args)
+  det_feats = osp.join('cache/feats', model_opt['dataset_splitBy'],
                        '%s_%s_%s_det_feats.h5' % (model_opt['net_name'], model_opt['imdb_name'], model_opt['tag']))
   loader.loadFeats({'det': det_feats})
 
+
   # check model_info and params
   assert model_opt['dataset'] == params['dataset']
-  assert model_opt['splitBy'] == params['splitBy']
 
   # evaluate on the split, 
   # predictions = [{sent_id, sent, gd_ann_id, pred_ann_id, pred_score, sub_attn, loc_attn, weights}]
@@ -91,9 +91,8 @@ def evaluate(params):
 if __name__ == '__main__':
     
   parser = argparse.ArgumentParser()
-  parser.add_argument('--dataset', type=str, default='refcoco', help='dataset name: refclef, refcoco, refcoco+, refcocog')
-  parser.add_argument('--splitBy', type=str, default='unc', help='splitBy: unc, google, berkeley')
-  parser.add_argument('--split', type=str, default='testA', help='split: testAB or val, etc')
+  parser.add_argument('--dataset', type=str, default='rsvg', help='dataset name: rsvg')
+  parser.add_argument('--split', type=str, default='test', help='split: test or val, etc')
   parser.add_argument('--id', type=str, default='0', help='model id name')
   parser.add_argument('--num_sents', type=int, default=-1, help='how many sentences to use when periodically evaluating the loss? (-1=all)')
   parser.add_argument('--verbose', type=int, default=1, help='if we want to print the testing progress')
@@ -101,7 +100,7 @@ if __name__ == '__main__':
   params = vars(args)
 
   # make other options
-  params['dataset_splitBy'] = params['dataset'] + '_' + params['splitBy']
+  params['dataset_splitBy'] = params['dataset']
   evaluate(params)
 
 
