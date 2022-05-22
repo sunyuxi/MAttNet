@@ -9,10 +9,24 @@ ID="mrcn_cmr_with_st"
 CUDA_VISIBLE_DEVICES=${GPU_ID} python ./tools/eval_dets.py \
                 --dataset ${DATASET} \
                 --split ${SPLIT} \
+		--iou_threshold 0.5 \
                 --id ${ID}
 
-#SPLIT='val' #$3
-#CUDA_VISIBLE_DEVICES=${GPU_ID} python ./tools/eval_dets.py \
-#                --dataset ${DATASET} \
-#                --split ${SPLIT} \
-#                --id ${ID}
+CUDA_VISIBLE_DEVICES=${GPU_ID} python ./tools/eval_dets.py \
+                --dataset ${DATASET} \
+                --split ${SPLIT} \
+		--iou_threshold 0.25 \
+                --id ${ID}
+
+SPLIT='val' #$3
+CUDA_VISIBLE_DEVICES=${GPU_ID} python ./tools/eval_dets.py \
+                --dataset ${DATASET} \
+                --split ${SPLIT} \
+		--iou_threshold 0.5 \
+                --id ${ID}
+
+CUDA_VISIBLE_DEVICES=${GPU_ID} python ./tools/eval_dets.py \
+                --dataset ${DATASET} \
+                --split ${SPLIT} \
+		--iou_threshold 0.25 \
+                --id ${ID}

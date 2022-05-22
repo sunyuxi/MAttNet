@@ -30,7 +30,7 @@ def computeIoU(box1, box2):
   return float(inter)/union
 
 
-def eval_split(loader, model, crit, split, opt):
+def eval_split(loader, model, crit, split, opt, iou_threshold):
   verbose = opt.get('verbose', True)
   num_sents = opt.get('num_sents', -1)
   assert split != 'train', 'Check the evaluation split. (comment this line if you are evaluating [train])'
@@ -83,7 +83,7 @@ def eval_split(loader, model, crit, split, opt):
       pred_det_id = det_ids[pred_ix]
       pred_box = loader.Dets[pred_det_id]['box']
       gd_box = data['gd_boxes'][i]
-      if computeIoU(pred_box, gd_box) >= 0.5:
+      if computeIoU(pred_box, gd_box) >= iou_threshold: #0.5
         acc += 1
       loss_evals += 1
 
