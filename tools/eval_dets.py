@@ -70,7 +70,7 @@ def evaluate(params):
   model_opt['num_sents'] = params['num_sents']
   model_opt['verbose'] = params['verbose']
   crit = None
-  acc, predictions = eval_utils.eval_split(loader, model, crit, split, model_opt)
+  acc, predictions = eval_utils.eval_split(loader, model, crit, split, model_opt, params['iou_threshold'])
   print('Comprehension on %s\'s %s (%s sents) is %.2f%%' % \
         (params['dataset_splitBy'], params['split'], len(predictions), acc*100.)) 
 
@@ -95,6 +95,7 @@ if __name__ == '__main__':
   parser.add_argument('--split', type=str, default='test', help='split: test or val, etc')
   parser.add_argument('--id', type=str, default='0', help='model id name')
   parser.add_argument('--num_sents', type=int, default=-1, help='how many sentences to use when periodically evaluating the loss? (-1=all)')
+  parser.add_argument('--iou_threshold', type=float, default=0.5, help='iou threshold')
   parser.add_argument('--verbose', type=int, default=1, help='if we want to print the testing progress')
   args = parser.parse_args()
   params = vars(args)
